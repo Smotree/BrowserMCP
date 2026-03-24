@@ -1,7 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { createServer, type Server as HttpServer } from "node:http";
 import { randomUUID } from "node:crypto";
-import { execSync } from "node:child_process";
 import type { BrowserCommand, BrowserResponse } from "./types.js";
 
 interface PendingRequest {
@@ -23,21 +22,7 @@ export class WebSocketBridge {
   }
 
   async start(): Promise<void> {
-    try {
-      await this.tryListen(this.port);
-    } catch (err: unknown) {
-      if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
-        process.stderr.write(
-          `[BrowserMCP] Port ${this.port} is in use, killing old process...\n`
-        );
-        this.killPortHolder(this.port);
-        await new Promise((r) => setTimeout(r, 500));
-        await this.tryListen(this.port);
-      } else {
-        throw err;
-      }
-    }
-
+    await this.tryListen(this.port);
     this.setupServer();
     process.stderr.write(
       `[BrowserMCP] WebSocket server listening on port ${this.port}\n`
@@ -46,12 +31,9 @@ export class WebSocketBridge {
 
   private tryListen(port: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      // HTTP server handles /health checks, WebSocket upgrades go to wss
       this.httpServer = createServer((req, res) => {
-        // CORS headers for extension fetch probe
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Methods", "GET");
-
         if (req.url === "/health") {
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ status: "ok", connected: this.isConnected() }));
@@ -72,29 +54,6 @@ export class WebSocketBridge {
       this.httpServer.on("error", (err) => reject(err));
       this.httpServer.listen(port, () => resolve());
     });
-  }
-
-  private killPortHolder(port: number): void {
-    try {
-      if (process.platform === "win32") {
-        const output = execSync(
-          `powershell -Command "(Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue).OwningProcess"`,
-          { encoding: "utf-8" }
-        ).trim();
-        const pids = [...new Set(output.split(/\r?\n/).filter(Boolean))];
-        for (const pid of pids) {
-          if (pid && pid !== String(process.pid)) {
-            execSync(`taskkill /F /PID ${pid}`, { stdio: "ignore" });
-          }
-        }
-      } else {
-        execSync(`fuser -k ${port}/tcp 2>/dev/null || true`, {
-          stdio: "ignore",
-        });
-      }
-    } catch {
-      // Best effort
-    }
   }
 
   private setupServer(): void {
