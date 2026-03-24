@@ -217,7 +217,15 @@ handlers.click = async ({ selector, tabId }) => {
 handlers.type = async ({ selector, text, tabId }) => {
   return await injectAndRun(tabId, (sel, txt) => {
     const el = document.querySelector(sel); if (!el) throw new Error(`Element not found: ${sel}`);
-    el.focus(); el.value = txt;
+    el.focus();
+    // Use native setter to bypass React/Vue/Angular controlled inputs
+    const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement : HTMLInputElement;
+    const nativeSetter = Object.getOwnPropertyDescriptor(proto.prototype, "value")?.set;
+    if (nativeSetter) {
+      nativeSetter.call(el, txt);
+    } else {
+      el.value = txt;
+    }
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
     return true;
