@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BrowserMCP Test Page</title>
+  <meta name="description" content="Test page for BrowserMCP — exercises all 35 browser automation tools.">
+  <meta name="author" content="BrowserMCP">
+  <meta property="og:title" content="BrowserMCP Test Page">
+  <meta property="og:description" content="Comprehensive test page for browser MCP tools.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com/test-page">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BrowserMCP Test">
+  <meta name="twitter:description" content="Test all MCP browser tools here.">
+  <link rel="canonical" href="https://example.com/test-page">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "BrowserMCP Test Page",
+    "description": "Test page for BrowserMCP tools"
+  }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: #1a1a1a; background: #f8f9fa; line-height: 1.6; }
+    h1 { text-align: center; padding: 24px; background: #1a1a2e; color: #fff; font-size: 24px; }
+    h2 { font-size: 18px; margin-bottom: 12px; color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 6px; }
+    section { max-width: 900px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    section + section { margin-top: 16px; }
+    label { display: block; margin-bottom: 6px; font-weight: 500; }
+    input[type="text"], input[type="email"], input[type="date"], textarea, select {
+      width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px; font-size: 14px;
+    }
+    textarea { min-height: 60px; resize: vertical; }
+    button { padding: 8px 16px; background: #4361ee; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin: 4px 4px 4px 0; font-size: 13px; }
+    button:hover { background: #3a56d4; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #f0f0f0; font-weight: 600; }
+    tr:nth-child(even) { background: #fafafa; }
+    .output { background: #f0f0f0; padding: 10px; border-radius: 4px; margin-top: 10px; min-height: 30px; font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+    .tag { display: inline-block; background: #e0e0e0; padding: 2px 8px; border-radius: 12px; margin: 2px; font-size: 12px; }
+    .highlight-item { padding: 8px; margin: 4px; background: #e8f4fd; border: 1px solid #bee3f8; border-radius: 4px; display: inline-block; }
+    .draggable { padding: 10px 16px; background: #ffd43b; border-radius: 4px; cursor: grab; display: inline-block; margin: 4px; user-select: none; }
+    .draggable:active { cursor: grabbing; }
+    .drop-zone { min-height: 80px; border: 2px dashed #aaa; border-radius: 8px; padding: 16px; text-align: center; color: #888; margin-top: 10px; transition: background 0.2s; }
+    .drop-zone.over { background: #e8f5e9; border-color: #4caf50; }
+    .style-box { width: 150px; height: 80px; display: inline-flex; align-items: center; justify-content: center; margin: 8px; border-radius: 8px; font-weight: 600; font-size: 13px; }
+    .scroll-marker { padding: 12px; margin: 400px 0; background: #fff3cd; border-left: 4px solid #ffc107; font-weight: 600; }
+    .scroll-marker:first-child { margin-top: 20px; }
+    .sidebar { float: right; width: 200px; background: #f5f5f5; padding: 12px; margin-left: 16px; border-radius: 4px; font-size: 12px; }
+    .article-body p { margin-bottom: 12px; }
+    a { color: #4361ee; }
+    .flex-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  </style>
+</head>
+<body>
+
+<h1>BrowserMCP Test Page</h1>
+
+<!-- ==================== SCROLL SECTION ==================== -->
+<section id="scroll-section">
+  <h2>1. Scroll Test</h2>
+  <p>This section has markers spread across a tall area. Use <code>browser_scroll</code> to navigate.</p>
+  <div style="height: 2500px; position: relative; background: linear-gradient(to bottom, #f0f0f0, #d0d0d0); border-radius: 4px; margin-top: 10px;">
+    <div class="scroll-marker" style="position: absolute; top: 0; left: 16px; right: 16px;">Marker 1 — Top (0px)</div>
+    <div class="scroll-marker" style="position: absolute; top: 500px; left: 16px; right: 16px;">Marker 2 — 500px</div>
+    <div class="scroll-marker" style="position: absolute; top: 1000px; left: 16px; right: 16px;">Marker 3 — 1000px</div>
+    <div class="scroll-marker" style="position: absolute; top: 1500px; left: 16px; right: 16px;">Marker 4 — 1500px</div>
+    <div class="scroll-marker" style="position: absolute; top: 2000px; left: 16px; right: 16px;">Marker 5 — 2000px</div>
+    <div class="scroll-marker" id="scroll-target" style="position: absolute; top: 2400px; left: 16px; right: 16px;">Marker 6 — Scroll Target (2400px)</div>
+  </div>
+</section>
+
+<!-- ==================== FORM SECTION ==================== -->
+<section id="form-section">
+  <h2>2. Form Inputs</h2>
+  <form id="test-form" onsubmit="event.preventDefault(); document.getElementById('form-output').textContent = JSON.stringify(Object.fromEntries(new FormData(this)), null, 2);">
+    <label for="name-input">Name:</label>
+    <input type="text" id="name-input" name="name" placeholder="Enter your name">
+
+    <label for="email-input">Email:</label>
+    <input type="email" id="email-input" name="email" placeholder="user@example.com">
+
+    <label for="date-input">Date:</label>
+    <input type="date" id="date-input" name="date">
+
+    <label for="message-input">Message:</label>
+    <textarea id="message-input" name="message" placeholder="Enter a message..."></textarea>
+
+    <label for="color-select">Favorite Color:</label>
+    <select id="color-select" name="color">
+      <option value="">-- Select --</option>
+      <option value="red">Red</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <option value="yellow">Yellow</option>
+      <option value="purple">Purple</option>
+    </select>
+
+    <div style="margin: 10px 0;">
+      <label><input type="checkbox" name="agree" value="yes"> I agree to the terms</label>
+    </div>
+
+    <div style="margin: 10px 0;">
+      <label><input type="radio" name="plan" value="free"> Free</label>
+      <label><input type="radio" name="plan" value="pro"> Pro</label>
+      <label><input type="radio" name="plan" value="enterprise"> Enterprise</label>
+    </div>
+
+    <button type="submit" id="submit-btn">Submit Form</button>
+  </form>
+  <div class="output" id="form-output">Form output will appear here...</div>
+</section>
+
+<!-- ==================== TABLE SECTION ==================== -->
+<section id="table-section">
+  <h2>3. Table Data</h2>
+  <table id="data-table">
+    <thead>
+      <tr><th>ID</th><th>Product</th><th>Price</th><th>Stock</th><th>Category</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Mechanical Keyboard</td><td>$149.99</td><td>45</td><td>Electronics</td></tr>
+      <tr><td>2</td><td>Wireless Mouse</td><td>$59.99</td><td>120</td><td>Electronics</td></tr>
+      <tr><td>3</td><td>USB-C Hub</td><td>$39.99</td><td>80</td><td>Accessories</td></tr>
+      <tr><td>4</td><td>Monitor Stand</td><td>$89.99</td><td>30</td><td>Furniture</td></tr>
+      <tr><td>5</td><td>Webcam HD</td><td>$79.99</td><td>65</td><td>Electronics</td></tr>
+      <tr><td>6</td><td>Desk Lamp</td><td>$34.99</td><td>90</td><td>Furniture</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ==================== LINKS SECTION ==================== -->
+<section id="links-section">
+  <h2>4. Links</h2>
+  <ul>
+    <li><a href="https://example.com">External: example.com</a></li>
+    <li><a href="https://example.org/page?q=test">External with params: example.org</a></li>
+    <li><a href="#scroll-section">Internal anchor: #scroll-section</a></li>
+    <li><a href="#form-section">Internal anchor: #form-section</a></li>
+    <li><a href="mailto:test@example.com">Mailto: test@example.com</a></li>
+    <li><a href="javascript:void(0)" onclick="alert('Link clicked!')">JavaScript void link</a></li>
+    <li><a href="https://example.com/docs" target="_blank" rel="noopener">New tab link (target=_blank)</a></li>
+    <li><a href="https://example.com/api" class="api-link">API Documentation</a></li>
+  </ul>
+</section>
+
+<!-- ==================== DYNAMIC SECTION ==================== -->
+<section id="dynamic-section">
+  <h2>5. Dynamic Content</h2>
+  <p>Click the button to load content after a 2-second delay. Use <code>browser_wait_for</code> to detect it.</p>
+  <button id="load-dynamic-btn" onclick="
+    this.disabled = true;
+    this.textContent = 'Loading...';
+    setTimeout(() => {
+      document.getElementById('dynamic-content').innerHTML = '<div id=\'loaded-element\' class=\'tag\' style=\'font-size:16px; padding:8px 16px;\'>Dynamic content loaded successfully!</div>';
+      this.textContent = 'Load Content';
+      this.disabled = false;
+    }, 2000);
+  ">Load Content (2s delay)</button>
+  <div id="dynamic-content" class="output">Content will appear here...</div>
+
+  <h3 style="margin-top: 16px;">Live Counter</h3>
+  <p>Counter increments every second. Use <code>browser_watch_changes</code> to detect updates.</p>
+  <div id="counter-display" class="output">Counter: <span id="counter-value">0</span></div>
+  <script>
+    let counterVal = 0;
+    setInterval(() => { counterVal++; document.getElementById('counter-value').textContent = counterVal; }, 1000);
+  </script>
+</section>
+
+<!-- ==================== STORAGE SECTION ==================== -->
+<section id="storage-section">
+  <h2>6. Web Storage</h2>
+  <div class="flex-row">
+    <button onclick="localStorage.setItem('testKey', 'testValue_' + Date.now()); updateStorageDisplay();">Set localStorage</button>
+    <button onclick="sessionStorage.setItem('sessionKey', 'sessionValue_' + Date.now()); updateStorageDisplay();">Set sessionStorage</button>
+    <button onclick="localStorage.clear(); sessionStorage.clear(); updateStorageDisplay();">Clear All</button>
+  </div>
+  <div class="output" id="storage-display">Storage contents...</div>
+  <script>
+    function updateStorageDisplay() {
+      let text = 'localStorage:\n';
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); text += `  ${k} = ${localStorage.getItem(k)}\n`; }
+      text += '\nsessionStorage:\n';
+      for (let i = 0; i < sessionStorage.length; i++) { const k = sessionStorage.key(i); text += `  ${k} = ${sessionStorage.getItem(k)}\n`; }
+      document.getElementById('storage-display').textContent = text || 'Empty';
+    }
+    updateStorageDisplay();
+  </script>
+</section>
+
+<!-- ==================== COOKIE SECTION ==================== -->
+<section id="cookie-section">
+  <h2>7. Cookies</h2>
+  <div class="flex-row">
+    <button onclick="document.cookie = 'testCookie=hello_' + Date.now() + '; path=/'; updateCookieDisplay();">Set Test Cookie</button>
+    <button onclick="document.cookie = 'theme=dark; path=/'; updateCookieDisplay();">Set Theme Cookie</button>
+  </div>
+  <div class="output" id="cookie-display">Cookies...</div>
+  <script>
+    function updateCookieDisplay() {
+      document.getElementById('cookie-display').textContent = document.cookie || '(no cookies)';
+    }
+    updateCookieDisplay();
+  </script>
+</section>
+
+<!-- ==================== IMAGES SECTION ==================== -->
+<section id="images-section">
+  <h2>8. Images</h2>
+  <div class="flex-row">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' fill='%234361ee'%3E%3Crect width='120' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='14'%3EImage 1%3C/text%3E%3C/svg%3E" alt="Blue rectangle - Image 1" width="120" height="80">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' fill='%23e74c3c'%3E%3Crect width='120' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='14'%3EImage 2%3C/text%3E%3C/svg%3E" alt="Red rectangle - Image 2" width="120" height="80">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' fill='%232ecc71'%3E%3Crect width='120' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='14'%3EImage 3%3C/text%3E%3C/svg%3E" alt="Green rectangle - Image 3" width="120" height="80">
+  </div>
+</section>
+
+<!-- ==================== DRAG & DROP SECTION ==================== -->
+<section id="drag-section">
+  <h2>9. Drag and Drop</h2>
+  <div class="flex-row">
+    <div class="draggable" id="drag-item-1" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', this.id);">Drag Item 1</div>
+    <div class="draggable" id="drag-item-2" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', this.id);">Drag Item 2</div>
+    <div class="draggable" id="drag-item-3" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', this.id);">Drag Item 3</div>
+  </div>
+  <div class="drop-zone" id="drop-target"
+    ondragover="event.preventDefault(); this.classList.add('over');"
+    ondragleave="this.classList.remove('over');"
+    ondrop="event.preventDefault(); this.classList.remove('over'); const id = event.dataTransfer.getData('text/plain'); const el = document.getElementById(id); if(el) { this.appendChild(el); this.querySelector('.placeholder')?.remove(); }"
+  >
+    <span class="placeholder">Drop items here</span>
+  </div>
+</section>
+
+<!-- ==================== KEYBOARD SECTION ==================== -->
+<section id="keyboard-section">
+  <h2>10. Keyboard Events</h2>
+  <label for="keyboard-input">Type or press keys here:</label>
+  <input type="text" id="keyboard-input" placeholder="Focus and press keys...">
+  <div class="output" id="keyboard-output">Last key: (none)</div>
+  <script>
+    document.getElementById('keyboard-input').addEventListener('keydown', (e) => {
+      const mods = [];
+      if (e.ctrlKey) mods.push('Ctrl');
+      if (e.shiftKey) mods.push('Shift');
+      if (e.altKey) mods.push('Alt');
+      if (e.metaKey) mods.push('Meta');
+      const combo = [...mods, e.key].join('+');
+      document.getElementById('keyboard-output').textContent = `Last key: ${combo} (code: ${e.code})`;
+    });
+  </script>
+</section>
+
+<!-- ==================== STYLE SECTION ==================== -->
+<section id="style-section">
+  <h2>11. Computed Styles</h2>
+  <div class="flex-row">
+    <div class="style-box" id="style-box-1" style="background: #4361ee; color: white; font-size: 16px;">Box 1</div>
+    <div class="style-box" id="style-box-2" style="background: #e74c3c; color: white; font-size: 20px; opacity: 0.8;">Box 2</div>
+    <div class="style-box" id="style-box-3" style="background: #2ecc71; color: #1a1a1a; font-size: 14px; border: 3px solid #27ae60;">Box 3</div>
+  </div>
+</section>
+
+<!-- ==================== CONSOLE SECTION ==================== -->
+<section id="console-section">
+  <h2>12. Console Output</h2>
+  <div class="flex-row">
+    <button onclick="console.log('Test log message', { data: 42 });">console.log</button>
+    <button onclick="console.warn('Test warning message');">console.warn</button>
+    <button onclick="console.error('Test error message');">console.error</button>
+    <button onclick="console.info('Test info message');">console.info</button>
+  </div>
+  <p style="margin-top: 8px; color: #666; font-size: 12px;">Use <code>browser_console_log</code> start/get to capture output.</p>
+</section>
+
+<!-- ==================== NETWORK SECTION ==================== -->
+<section id="network-section">
+  <h2>13. Network Requests</h2>
+  <div class="flex-row">
+    <button id="fetch-btn" onclick="
+      fetch('https://httpbin.org/get?test=browserMCP')
+        .then(r => r.json())
+        .then(d => document.getElementById('network-output').textContent = JSON.stringify(d, null, 2))
+        .catch(e => document.getElementById('network-output').textContent = 'Error: ' + e.message);
+    ">Fetch GET</button>
+    <button onclick="
+      fetch('https://httpbin.org/post', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({test: true}) })
+        .then(r => r.json())
+        .then(d => document.getElementById('network-output').textContent = JSON.stringify(d, null, 2))
+        .catch(e => document.getElementById('network-output').textContent = 'Error: ' + e.message);
+    ">Fetch POST</button>
+    <button onclick="
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://httpbin.org/get?xhr=true');
+      xhr.onload = () => document.getElementById('network-output').textContent = xhr.responseText;
+      xhr.onerror = () => document.getElementById('network-output').textContent = 'XHR Error';
+      xhr.send();
+    ">XHR GET</button>
+  </div>
+  <div class="output" id="network-output">Response will appear here...</div>
+</section>
+
+<!-- ==================== HIGHLIGHT SECTION ==================== -->
+<section id="highlight-section">
+  <h2>14. Highlight Test</h2>
+  <p>Use <code>browser_highlight</code> with selector <code>.highlight-item</code> to highlight these elements:</p>
+  <div class="flex-row">
+    <div class="highlight-item">Item Alpha</div>
+    <div class="highlight-item">Item Beta</div>
+    <div class="highlight-item">Item Gamma</div>
+    <div class="highlight-item">Item Delta</div>
+    <div class="highlight-item">Item Epsilon</div>
+  </div>
+</section>
+
+<!-- ==================== READABILITY SECTION ==================== -->
+<section id="readability-section">
+  <h2>15. Readability / Article Extraction</h2>
+  <article id="test-article">
+    <div class="sidebar">
+      <strong>Related Links</strong>
+      <ul>
+        <li><a href="#">Link 1</a></li>
+        <li><a href="#">Link 2</a></li>
+        <li><a href="#">Link 3</a></li>
+      </ul>
+      <p>This sidebar content should ideally be excluded by readability extraction.</p>
+    </div>
+    <h3>The Rise of Browser Automation</h3>
+    <div class="article-body">
+      <p>Browser automation has become an essential tool in modern software development. From testing web applications to scraping data, the ability to programmatically control a browser opens up countless possibilities.</p>
+      <p>The Model Context Protocol (MCP) represents a new paradigm in how AI assistants interact with external tools. By creating a standardized protocol, different AI systems can leverage the same set of tools without custom integrations.</p>
+      <p>BrowserMCP bridges the gap between AI assistants and the web browser. It allows AI models to navigate pages, read content, fill forms, click buttons, and much more — all through the user's authenticated browser session.</p>
+      <p>This approach has a significant advantage over traditional web scraping: it can access pages that require authentication, handle JavaScript-rendered content, and interact with dynamic web applications just as a human user would.</p>
+      <p>The future of browser automation lies in making it more accessible and intelligent. With AI-powered tools, even complex multi-step workflows can be automated with simple natural language instructions.</p>
+    </div>
+  </article>
+</section>
+
+<!-- ==================== FIND TEXT SECTION ==================== -->
+<section id="find-text-section">
+  <h2>16. Text Search</h2>
+  <p>Use <code>browser_find_text</code> to search for text across this page. Try searching for "automation", "BrowserMCP", or "keyboard".</p>
+  <p>Here is some unique searchable text: <strong>XYZZY_MARKER_12345</strong> — this should be easy to find.</p>
+</section>
+
+</body>
+</html>

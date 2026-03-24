@@ -1,0 +1,14 @@
+{
+  "name": "browser-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["server"],
+  "scripts": {
+    "build": "npm run build -w server",
+    "start": "node server/dist/index.js",
+    "dev": "npx tsx server/src/index.ts",
+    "test:serve": "npx serve test -p 8111 --no-clipboard",
+    "test:quick": "node test/quick-test.mjs",
+    "test:demo": "node test/demo-test.mjs"
+  }
+}
