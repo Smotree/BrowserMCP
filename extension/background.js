@@ -251,7 +251,7 @@ handlers.scroll = async ({ direction, pixels = 500, selector, tabId }) => {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
     } else {
       const map = { up: [0, -px], down: [0, px], left: [-px, 0], right: [px, 0] };
-      const [x, y] = map[dir || "down"];
+      const [x, y] = map[dir] || map.down;
       window.scrollBy(x, y);
     }
     return { scrollX: Math.round(window.scrollX), scrollY: Math.round(window.scrollY) };
@@ -505,9 +505,11 @@ handlers.network_log = async ({ action, filter, tabId }) => {
         try {
           const resp = await origFetch.apply(this, args);
           window.__bmcpNetLog.push({ url, method, status: resp.status, type: "fetch", duration: Date.now() - start, timestamp: start });
+          if (window.__bmcpNetLog.length > 1000) window.__bmcpNetLog.shift();
           return resp;
         } catch (e) {
           window.__bmcpNetLog.push({ url, method, status: 0, type: "fetch", error: e.message, duration: Date.now() - start, timestamp: start });
+          if (window.__bmcpNetLog.length > 1000) window.__bmcpNetLog.shift();
           throw e;
         }
       };
@@ -524,6 +526,7 @@ handlers.network_log = async ({ action, filter, tabId }) => {
           this.__bmcpInfo.start = Date.now();
           this.addEventListener("loadend", () => {
             window.__bmcpNetLog.push({ url: this.__bmcpInfo.url, method: this.__bmcpInfo.method, status: this.status, type: "xhr", duration: Date.now() - this.__bmcpInfo.start, timestamp: this.__bmcpInfo.start });
+            if (window.__bmcpNetLog.length > 1000) window.__bmcpNetLog.shift();
           });
         }
         return origSend.apply(this, arguments);
@@ -560,6 +563,7 @@ handlers.console_log = async ({ action, tabId }) => {
         window.__bmcpOrigConsole[lvl] = console[lvl];
         console[lvl] = function (...args) {
           window.__bmcpConsoleLog.push({ level: lvl, args: args.map((a) => { try { return typeof a === "object" ? JSON.stringify(a) : String(a); } catch { return String(a); } }), timestamp: Date.now() });
+          if (window.__bmcpConsoleLog.length > 1000) window.__bmcpConsoleLog.shift();
           window.__bmcpOrigConsole[lvl].apply(console, args);
         };
       }
@@ -744,7 +748,10 @@ async function handleCommand(msg) {
   const handler = handlers[action];
   if (!handler) return { id, error: `Unknown action: ${action}` };
   try {
-    const result = await handler(params || {});
+    const result = await Promise.race([
+      handler(params || {}),
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`Command '${action}' timed out after 55s`)), 55_000)),
+    ]);
     return { id, result };
   } catch (e) {
     return { id, error: e.message || String(e) };

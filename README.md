@@ -212,6 +212,10 @@ Both test scripts auto-kill any process on port 12800 before starting.
 |---------------------|---------|-------------|
 | `BROWSER_MCP_WS_PORT` | `12800` | WebSocket port for server-extension communication |
 
+## Multi-instance (HTTP Relay)
+
+When multiple IDE windows are open, each launches its own BrowserMCP server. The first instance owns port 12800 and connects to the Chrome extension directly. Subsequent instances detect the port is busy and automatically switch to **HTTP relay mode** — they proxy commands through the first instance's `/exec` endpoint. This is transparent: all tools work the same regardless of which instance you use.
+
 ## Project Structure
 
 ```
