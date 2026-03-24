@@ -17,27 +17,15 @@ let fastPollTimer = null;
 // WebSocket Connection
 // ============================================================
 
-async function connect() {
+function connect() {
   if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) return;
 
-  // Probe the port first with fetch to avoid WebSocket ERR_CONNECTION_REFUSED spam.
-  // If fetch fails, the server is not running — skip WebSocket attempt entirely.
-  try {
-    await fetch(WS_URL.replace("ws://", "http://"), { mode: "no-cors", signal: AbortSignal.timeout(2000) });
-  } catch (e) {
-    // fetch throws on connection refused AND on non-http responses (which WS server gives).
-    // If it's a TypeError with "Failed to fetch" the port is closed. If it's an AbortError, timeout.
-    // A WS server will cause a different kind of error (bad response) — that means port IS open.
-    if (e.name === "AbortError" || (e.name === "TypeError" && !e.message?.includes("abort"))) {
-      // Port is closed, don't bother with WebSocket
-      return;
-    }
-    // Otherwise, port is open but returned non-HTTP — that's our WS server. Continue.
-  }
-
+  // NOTE: ERR_CONNECTION_REFUSED in devtools is a Chrome-internal log that cannot be
+  // suppressed from JS. It only appears in the extension's devtools console, not in
+  // the page console. This is harmless — the extension auto-reconnects when the server starts.
   try { ws = new WebSocket(WS_URL); } catch (e) { return; }
 
-  ws.onerror = () => {}; // suppress any remaining noise
+  ws.onerror = () => {}; // suppress JS-level error events
 
   ws.onopen = () => {
     connected = true;

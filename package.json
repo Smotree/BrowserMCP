@@ -9,6 +9,7 @@
     "dev": "npx tsx server/src/index.ts",
     "test:serve": "npx serve test -p 8111 --no-clipboard",
     "test:quick": "node test/quick-test.mjs",
-    "test:demo": "node test/demo-test.mjs"
+    "test:demo": "node test/demo-test.mjs",
+    "install-mcp": "node scripts/install-mcp.mjs"
   }
 }

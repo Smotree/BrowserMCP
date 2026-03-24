@@ -110,9 +110,18 @@ npm run build
 
 ### 3. Configure your MCP client
 
-#### Claude Code
+#### Auto-install (recommended)
 
-Add to `~/.claude/settings.json`:
+Run the install script — it auto-detects Claude Code, VS Code, Cursor, and Claude Desktop:
+
+```bash
+node scripts/install-mcp.mjs
+```
+
+#### Manual setup
+
+<details>
+<summary><b>Claude Code</b> — <code>~/.claude/settings.json</code></summary>
 
 ```json
 {
@@ -125,7 +134,35 @@ Add to `~/.claude/settings.json`:
 }
 ```
 
-Or add `.mcp.json` to your project root:
+Or add `.mcp.json` to your project root with the same format.
+</details>
+
+<details>
+<summary><b>VS Code</b> — <code>%APPDATA%/Code/User/mcp.json</code> (Win) / <code>~/Library/Application Support/Code/User/mcp.json</code> (Mac)</summary>
+
+```json
+{
+  "servers": {
+    "browser": {
+      "command": "node",
+      "args": ["/path/to/BrowserMCP/server/dist/index.js"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+If the file already has other servers, just add `"browser": { ... }` inside `"servers"`.
+</details>
+
+<details>
+<summary><b>Cursor</b> — <code>%APPDATA%/Cursor/User/mcp.json</code> (Win) / <code>~/Library/Application Support/Cursor/User/mcp.json</code> (Mac)</summary>
+
+Same format as VS Code above.
+</details>
+
+<details>
+<summary><b>Claude Desktop</b> — <code>%APPDATA%/Claude/claude_desktop_config.json</code> (Win) / <code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (Mac)</summary>
 
 ```json
 {
@@ -137,10 +174,7 @@ Or add `.mcp.json` to your project root:
   }
 }
 ```
-
-#### Cursor / Other MCP Clients
-
-Same configuration format — point to `server/dist/index.js` as a stdio command.
+</details>
 
 ### 4. Verify
 
