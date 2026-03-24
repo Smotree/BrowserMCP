@@ -33,10 +33,25 @@ export class WebSocketBridge {
     return new Promise((resolve, reject) => {
       this.httpServer = createServer((req, res) => {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Methods", "GET");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST");
         if (req.url === "/health") {
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ status: "ok", connected: this.isConnected() }));
+        } else if (req.url === "/exec" && req.method === "POST") {
+          // HTTP relay: other BrowserMCP instances can send commands through us
+          let body = "";
+          req.on("data", (chunk) => (body += chunk));
+          req.on("end", async () => {
+            try {
+              const { action, params } = JSON.parse(body);
+              const result = await this.sendCommand(action, params);
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ result }));
+            } catch (e: unknown) {
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ error: (e as Error).message }));
+            }
+          });
         } else {
           res.writeHead(404);
           res.end();
@@ -105,6 +120,11 @@ export class WebSocketBridge {
     action: string,
     params: Record<string, unknown> = {}
   ): Promise<unknown> {
+    // HTTP relay mode — forward to primary instance
+    if (this.relayPort) {
+      return this.sendViaHttp(action, params);
+    }
+
     return new Promise((resolve, reject) => {
       if (!this.client || this.client.readyState !== WebSocket.OPEN) {
         reject(
@@ -128,7 +148,19 @@ export class WebSocketBridge {
     });
   }
 
+  private relayPort: number | null = null;
+
+  /**
+   * Enable HTTP relay mode — forward all commands via HTTP POST to
+   * an already-running BrowserMCP instance's /exec endpoint.
+   */
+  enableHttpRelay(port: number): void {
+    this.relayPort = port;
+    process.stderr.write(`[BrowserMCP] HTTP relay enabled → localhost:${port}\n`);
+  }
+
   isConnected(): boolean {
+    if (this.relayPort) return true; // relay always "connected"
     return this.client !== null && this.client.readyState === WebSocket.OPEN;
   }
 
@@ -136,14 +168,31 @@ export class WebSocketBridge {
     this.connectionCallbacks.push(callback);
   }
 
+  private async sendViaHttp(
+    action: string,
+    params: Record<string, unknown>
+  ): Promise<unknown> {
+    const resp = await fetch(`http://localhost:${this.relayPort}/exec`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, params }),
+      signal: AbortSignal.timeout(60_000),
+    });
+    const data = (await resp.json()) as { result?: unknown; error?: string };
+    if (data.error) throw new Error(data.error);
+    return data.result;
+  }
+
   async close(): Promise<void> {
     this.rejectAllPending("Server shutting down");
     this.client?.close();
-    return new Promise((resolve) => {
-      this.wss.close(() => {
-        this.httpServer.close(() => resolve());
+    if (this.wss) {
+      return new Promise((resolve) => {
+        this.wss.close(() => {
+          this.httpServer.close(() => resolve());
+        });
       });
-    });
+    }
   }
 
   private notifyConnectionChange(connected: boolean): void {
