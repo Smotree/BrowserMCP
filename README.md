@@ -115,7 +115,8 @@ npm run build
 Run the install script — it auto-detects Claude Code, VS Code, Cursor, and Claude Desktop:
 
 ```bash
-node scripts/install-mcp.mjs
+npm run install-mcp        # install to all detected clients
+npm run install-mcp -- --uninstall  # remove from all
 ```
 
 #### Manual setup
