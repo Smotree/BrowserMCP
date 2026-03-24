@@ -29,8 +29,8 @@ function writeJson(path, data) {
 
 const configs = [
   {
-    name: "Claude Code (global settings.json)",
-    path: resolve(home, ".claude", "settings.json"),
+    name: "Claude Code (user-scoped ~/.claude.json)",
+    path: resolve(home, ".claude.json"),
     format: "claude", // { mcpServers: { ... } }
   },
   {

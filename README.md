@@ -121,12 +121,19 @@ node scripts/install-mcp.mjs
 #### Manual setup
 
 <details>
-<summary><b>Claude Code</b> — <code>~/.claude/settings.json</code></summary>
+<summary><b>Claude Code</b> — <code>~/.claude.json</code> (user-scoped, all projects)</summary>
 
+Via CLI:
+```bash
+claude mcp add --transport stdio --scope user browser -- node /path/to/BrowserMCP/server/dist/index.js
+```
+
+Or manually add to `~/.claude.json`:
 ```json
 {
   "mcpServers": {
     "browser": {
+      "type": "stdio",
       "command": "node",
       "args": ["/path/to/BrowserMCP/server/dist/index.js"]
     }
@@ -134,7 +141,7 @@ node scripts/install-mcp.mjs
 }
 ```
 
-Or add `.mcp.json` to your project root with the same format.
+For a single project only, add `.mcp.json` to the project root with the same format.
 </details>
 
 <details>
