@@ -50,9 +50,12 @@ async function connect() {
       const msg = JSON.parse(event.data);
       if (msg.id && msg.action) {
         const response = await handleCommand(msg);
-        ws.send(JSON.stringify(response));
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(response));
+        }
       }
     } catch (e) {
+      if (e?.message?.includes("null")) return; // connection closed mid-command
       console.error("[BrowserMCP] Message error:", e);
     }
   };
