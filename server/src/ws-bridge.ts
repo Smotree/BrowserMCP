@@ -1,4 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
+import { createServer, type Server as HttpServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { execSync } from "node:child_process";
 import type { BrowserCommand, BrowserResponse } from "./types.js";
@@ -10,6 +11,7 @@ interface PendingRequest {
 }
 
 export class WebSocketBridge {
+  private httpServer!: HttpServer;
   private wss!: WebSocketServer;
   private client: WebSocket | null = null;
   private pending = new Map<string, PendingRequest>();
@@ -44,8 +46,31 @@ export class WebSocketBridge {
 
   private tryListen(port: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.wss = new WebSocketServer({ port }, () => resolve());
-      this.wss.on("error", (err) => reject(err));
+      // HTTP server handles /health checks, WebSocket upgrades go to wss
+      this.httpServer = createServer((req, res) => {
+        // CORS headers for extension fetch probe
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "GET");
+
+        if (req.url === "/health") {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ status: "ok", connected: this.isConnected() }));
+        } else {
+          res.writeHead(404);
+          res.end();
+        }
+      });
+
+      this.wss = new WebSocketServer({ noServer: true });
+
+      this.httpServer.on("upgrade", (req, socket, head) => {
+        this.wss.handleUpgrade(req, socket, head, (ws) => {
+          this.wss.emit("connection", ws, req);
+        });
+      });
+
+      this.httpServer.on("error", (err) => reject(err));
+      this.httpServer.listen(port, () => resolve());
     });
   }
 
@@ -156,7 +181,9 @@ export class WebSocketBridge {
     this.rejectAllPending("Server shutting down");
     this.client?.close();
     return new Promise((resolve) => {
-      this.wss.close(() => resolve());
+      this.wss.close(() => {
+        this.httpServer.close(() => resolve());
+      });
     });
   }
 

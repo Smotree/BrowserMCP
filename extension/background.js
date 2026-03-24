@@ -17,15 +17,24 @@ let fastPollTimer = null;
 // WebSocket Connection
 // ============================================================
 
-function connect() {
+const HEALTH_URL = WS_URL.replace("ws://", "http://") + "/health";
+
+async function connect() {
   if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) return;
 
-  // NOTE: ERR_CONNECTION_REFUSED in devtools is a Chrome-internal log that cannot be
-  // suppressed from JS. It only appears in the extension's devtools console, not in
-  // the page console. This is harmless — the extension auto-reconnects when the server starts.
+  // Probe /health endpoint first — avoids ERR_CONNECTION_REFUSED spam from WebSocket
+  try {
+    const resp = await fetch(HEALTH_URL, { signal: AbortSignal.timeout(2000) });
+    if (!resp.ok) return;
+  } catch {
+    // Server not running — skip WebSocket entirely, no error logged
+    return;
+  }
+
+  // Server is alive — safe to connect WebSocket
   try { ws = new WebSocket(WS_URL); } catch (e) { return; }
 
-  ws.onerror = () => {}; // suppress JS-level error events
+  ws.onerror = () => {};
 
   ws.onopen = () => {
     connected = true;
